@@ -31,28 +31,38 @@ exports.getArticlesById = (id) =>{
     })
   }
 
-  exports.getArticles = () =>{
-    const sqlQuery = `SELECT * FROM articles ORDER BY created_at DESC `
+ exports.getArticles = () => {
+    const sqlQuery = `
+        SELECT articles.*, comments.comment_id
+        FROM articles
+        LEFT JOIN comments ON articles.article_id = comments.article_id`;
+    
     return db.query(sqlQuery)
-    .then ((articles)=>{
-        const removeBodyObject = articles.rows.map((article)=>{
+        .then((result) => {
 
-            delete article.body
+            const articleGroups = result.rows.reduce((acc, curr) => {
+                acc[curr.article_id] = acc[curr.article_id] || [];
+                acc[curr.article_id].push(curr);
+                return acc;
+            }, {});
 
-            return {
-                article_id: article.article_id,
-                artitle:article.title,
-                topic:article.topic,
-                author:article.author,
-                created_at:article.created_at,
-                votes:article.votes,
-                article_img_url:article.article_img_url
+            const articles = Object.values(articleGroups).map(groupedArt => {
+                const article = groupedArt[0];
 
-            }
-        })
+                return {
+                    article_id: article.article_id,
+                    title: article.title,
+                    topic: article.topic,
+                    author: article.author,
+                    created_at: article.created_at,
+                    votes: article.votes,
+                    article_img_url: article.article_img_url,
+                    comment_count: groupedArt.length
+                };
+            });
 
-        return removeBodyObject
-    })
-  }
-
-
+            return articles.sort((a, b) => 
+                new Date(b.created_at) - new Date(a.created_at)
+            );
+        }); 
+};
