@@ -31,4 +31,28 @@ exports.getArticlesById = (id) =>{
     })
   }
 
+  exports.getArticles = () =>{
+    const sqlQuery = `SELECT * FROM articles ORDER BY created_at DESC `
+    return db.query(sqlQuery)
+    .then ((articles)=>{
+        const removeBodyObject = articles.rows.map((article)=>{
+
+            delete article.body
+
+            return {
+                article_id: article.article_id,
+                artitle:article.title,
+                topic:article.topic,
+                author:article.author,
+                created_at:article.created_at,
+                votes:article.votes,
+                article_img_url:article.article_img_url
+
+            }
+        })
+
+        return removeBodyObject
+    })
+  }
+
 

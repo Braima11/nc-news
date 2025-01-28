@@ -14,7 +14,6 @@ afterAll(()=>{
   return db.end()
 })
 
-
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
     return request(app)
@@ -87,5 +86,34 @@ describe("GET /api/articles/:article_id", ()=>{
       expect(body.msg).toBe("Invalid Id Input, Id must be an Integer")
     })
   })
+})
+
+describe("GET /api/articles", ()=>{
+  test ("get all articles from database",()=>{
+    return request (app)
+    .get("/api/articles")
+    .expect(200)
+    .then ((articles)=>{
+      const keysInArticle= articles.body.article[12]
+      expect(articles.body.article.length).toBe(13)
+      expect(keysInArticle).toHaveProperty("article_id")
+      expect(keysInArticle).toHaveProperty("artitle")
+      expect(keysInArticle).toHaveProperty("topic")
+      expect(keysInArticle).toHaveProperty("author")
+      expect(keysInArticle).toHaveProperty("created_at")
+      expect(keysInArticle).toHaveProperty("votes")
+      expect(keysInArticle).toHaveProperty("article_img_url")
+      expect(articles.body.article).toBeSortedBy('created_at',{descending: true})
+      
+    })
+  })
+  test("404: responds with error for incorrect path", () => {
+    return request(app)
+      .get("/api/articlezzzz")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Path not found");
+      });
+  });
 })
 

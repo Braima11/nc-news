@@ -1,4 +1,4 @@
-const {getEndPointInfo,getTopicsFromDb,getArticlesById}= require("../models/models")
+const {getEndPointInfo,getTopicsFromDb,getArticlesById,getArticles}= require("../models/models")
 
 exports.endPointInfos =(req,res,next) =>{
    const endpoints =  getEndPointInfo()
@@ -28,6 +28,17 @@ exports.articleInDbById = (req,res,next)=>{
     })
     .catch((error)=>{
       next(error)
+    })
+  }
+
+  exports.allArticles = (req,res,next)=>{
+    getArticles()
+    .then((article)=>{
+        res.status(200).json({article})
+
+    })
+    .catch((error)=>{
+        next(error)
     })
   }
   
