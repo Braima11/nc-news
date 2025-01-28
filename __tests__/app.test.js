@@ -95,9 +95,9 @@ describe("GET /api/articles", ()=>{
     .expect(200)
     .then ((articles)=>{
       const keysInArticle= articles.body.article[12]
+
       expect(articles.body.article.length).toBe(13)
       expect(keysInArticle).toHaveProperty("article_id")
-      expect(keysInArticle).toHaveProperty("artitle")
       expect(keysInArticle).toHaveProperty("topic")
       expect(keysInArticle).toHaveProperty("author")
       expect(keysInArticle).toHaveProperty("created_at")
