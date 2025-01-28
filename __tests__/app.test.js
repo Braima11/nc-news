@@ -13,9 +13,6 @@ afterAll(()=>{
   return db.end()
 })
 
-/* Set up your test imports here */
-
-/* Set up your beforeEach & afterAll functions here */
 
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
@@ -27,3 +24,36 @@ describe("GET /api", () => {
       });
   });
 });
+
+describe("GET /api/topics", () =>{
+  test (" will all data from topics table in the database", ()=>{
+    return request (app)
+    .get("/api/topics")
+    .expect(200)
+    .then (({body})=>{
+
+      console.log(body.topics)
+      
+      expect(Array.isArray(body.topics)).toBe(true)
+      expect(body.topics).toEqual(  [
+        { slug: 'mitch', description: 'The man, the Mitch, the legend' },
+        { slug: 'cats', description: 'Not dogs' },
+        { slug: 'paper', description: 'what books are made of' }
+      ])
+      expect(body.topics[0]).toMatchObject( { slug: 'mitch', description: 'The man, the Mitch, the legend' })
+      
+    })
+
+  })
+
+  test("test for bad path request", ()=>{
+    return request (app)
+    .get("/api/topic")
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Path not found")
+
+    })
+  })
+})
+
