@@ -4,7 +4,6 @@ const app = express()
 const {endPointInfos,
     allTopicsResponse, 
     articleInDbById} = require("./controller/controllers")
-const { errorMonitor } = require("supertest/lib/test")
 
 app.use(express.json())
 
@@ -12,6 +11,25 @@ app.get("/api",endPointInfos)
 
 app.get("/api/topics",allTopicsResponse)
 
+app.get("/api/articles/:article_id",articleInDbById)
+
+app.use((error,req,res,next) =>{
+
+    if (error.code ===  '22P02') {
+        res.status(404).json({msg:"Invalid Id Input, Id must be an Integer"})
+    }
+
+    if (error.status && error.msg ) {
+        res.status(error.status).json({msg:error.msg})
+    }
+
+    next()
+
+})
+
+app.use((err,req,res,next)=>{
+    console.log(err, " this error has not been handled yet")
+})
 
 
 app.all("*", (req,res)=>{
