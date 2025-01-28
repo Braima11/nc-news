@@ -20,5 +20,17 @@ exports.allTopicsResponse = (req,res,next) =>{
     })
 }
 
+exports.articleInDbById = (req,res,next)=>{
+    const articleId = req.params.article_id
+    getArticlesById(articleId)
+    .then ((article)=>{
+        res.status(200).json({article})
+    })
+    .catch((error)=>{
+      next(error)
+    })
+  }
+  
+  
 
 

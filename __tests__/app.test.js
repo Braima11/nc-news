@@ -4,6 +4,7 @@ const request = require("supertest")
 const app = require("../app");
 const testdata = require("../db/data/test-data/index")
 const seed = require("../db/seeds/seed");
+const sorted  = require('jest-sorted');
 
 beforeEach (()=>{
   return seed(testdata)
@@ -31,8 +32,6 @@ describe("GET /api/topics", () =>{
     .get("/api/topics")
     .expect(200)
     .then (({body})=>{
-
-      console.log(body.topics)
       
       expect(Array.isArray(body.topics)).toBe(true)
       expect(body.topics).toEqual(  [
@@ -53,6 +52,39 @@ describe("GET /api/topics", () =>{
     .then(({body})=>{
       expect(body.msg).toBe("Path not found")
 
+    })
+  })
+})
+
+describe("GET /api/articles/:article_id", ()=>{
+  test("get article by id from the database",()=>{
+    return request(app)
+    .get("/api/articles/1")
+    .expect(200)
+    .then(({body})=>{
+      expect(body.article.length).toBe(1)
+      expect(body.article[0]).toHaveProperty("article_id")
+      expect(body.article[0]).toHaveProperty("article_img_url")
+      expect(body.article[0]).toHaveProperty("author")
+      expect(body.article[0]).toHaveProperty("body")
+    })
+  })
+
+  test ("test for a id request that is out of range", () =>{
+    return request(app) 
+    .get("/api/articles/15")
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Article not found with this Id")
+    })
+  })
+
+  test ("test for an invalid id", () =>{
+    return request(app) 
+    .get("/api/articles/super")
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Invalid Id Input, Id must be an Integer")
     })
   })
 })
