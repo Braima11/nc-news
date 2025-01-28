@@ -3,7 +3,8 @@ const app = express()
 
 const {endPointInfos,
     allTopicsResponse, 
-    articleInDbById} = require("./controller/controllers")
+    articleInDbById,
+    allArticles} = require("./controller/controllers")
 
 app.use(express.json())
 
@@ -12,6 +13,8 @@ app.get("/api",endPointInfos)
 app.get("/api/topics",allTopicsResponse)
 
 app.get("/api/articles/:article_id",articleInDbById)
+
+app.get("/api/articles",allArticles)
 
 app.use((error,req,res,next) =>{
 
