@@ -5,6 +5,7 @@ const app = require("../app");
 const testdata = require("../db/data/test-data/index")
 const seed = require("../db/seeds/seed");
 const sorted  = require('jest-sorted');
+const users = require("../db/data/test-data/users");
 
 beforeEach (()=>{
   return seed(testdata)
@@ -289,4 +290,33 @@ test("valid id but no comment_id that matches it", () => {
           expect(body.msg).toBe( " comment_id not available cannot delete comment");
       });
 });
+})
+
+describe("GET /api/users", ()=>{
+  test("get users from databse", ()=>{
+    return request(app)
+    .get("/api/users")
+    .expect(200)
+    .then(((response)=>{
+
+      expect(Array.isArray(response.body.users)).toBe(true);
+      expect(response.body.users.length).toBe(4);
+
+      response.body.users.forEach((user)=>{
+        expect(user).toHaveProperty("username")
+        expect(user).toHaveProperty("name")
+        expect(user).toHaveProperty("avatar_url")
+      })
+
+    }))
+  })
+  test("test for bad path request", ()=>{
+    return request (app)
+    .get("/api/userz")
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("Path not found")
+
+    })
+  })
 })

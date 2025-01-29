@@ -8,7 +8,8 @@ const {endPointInfos,
     getCommentWithId,
     commentsById,
     votesUpdate,
-    commentToDelete} = require("./controller/controllers")
+    commentToDelete,
+    allUsersInDb} = require("./controller/controllers")
 
 app.use(express.json())
 
@@ -27,6 +28,8 @@ app.post("/api/articles/:article_id/comments",commentsById)
 app.patch("/api/articles/:article_id",votesUpdate)
 
 app.delete("/api/comments/:comment_id",commentToDelete)
+
+app.get("/api/users", allUsersInDb)
 
 
 

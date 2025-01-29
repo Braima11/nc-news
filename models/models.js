@@ -139,3 +139,12 @@ exports.deleteCommentsById = (id) =>{
         return db.query(sqlQuery,[id])
     })
 }
+
+exports.getUsersInDb = ()=>{
+    const sqlQuery = `SELECT * FROM users`
+    return db.query(sqlQuery)
+    .then((response)=>{
+        console.log(response.rows)
+        return response.rows
+    })
+}
