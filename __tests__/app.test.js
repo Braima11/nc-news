@@ -117,3 +117,47 @@ describe("GET /api/articles", ()=>{
   });
 })
 
+describe("GET /api/articles/:article_id/comments", () => {
+  test("getting comments from database using the article id", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then(({body}) => {
+        expect(body.comment.length).toBe(2)
+        expect(body.comment).toBeSortedBy('created_at',{descending: true})
+        body.comment.map((comments)=>{
+          
+          expect(comments).toHaveProperty("comment_id")
+          expect(comments).toHaveProperty("body")
+          expect(comments).toHaveProperty("article_id")
+          expect(comments).toHaveProperty("author")
+          expect(comments).toHaveProperty("votes")
+          expect(comments).toHaveProperty("created_at")
+        })
+        
+  });
+
+});
+
+test("testing for valid ids but with no comments", ()=>{
+
+  return request(app)
+  .get("/api/articles/2/comments")
+  .expect(404)
+  .then((comment)=>{
+    expect(comment.body.msg).toBe('No comment found')
+  })
+})
+
+test("testing for valid ids but with no comments", ()=>{
+
+  return request(app)
+  .get("/api/articles/update/comments")
+  .expect(404)
+  .then((comment)=>{
+
+    expect(comment.body.msg).toBe('Invalid Id Input, Id must be an Integer')
+  })
+})
+});
+

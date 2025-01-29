@@ -1,4 +1,9 @@
-const {getEndPointInfo,getTopicsFromDb,getArticlesById,getArticles}= require("../models/models")
+const {getEndPointInfo,
+    getTopicsFromDb,
+    getArticlesById,
+    getArticles,
+    getCommentsById,
+    }= require("../models/models")
 
 exports.endPointInfos =(req,res,next) =>{
    const endpoints =  getEndPointInfo()
@@ -41,7 +46,25 @@ exports.articleInDbById = (req,res,next)=>{
         next(error)
     })
   }
-  
+
+  exports.getCommentWithId = (req,res,next)=>{
+
+    const commentId = req.params.article_id
+
+    console.log(commentId, " id in controller "
+        
+    )
+    getCommentsById(commentId)
+    .then((comment)=>{
+        res.status(200).json({comment})
+    })
+    .catch((error)=>{
+        next(error)
+    })
+  }
+
+
+
   
 
 
