@@ -66,3 +66,20 @@ exports.getArticlesById = (id) =>{
             );
         }); 
 };
+
+exports.getCommentsById = (id)=>{
+    const sqlQuery = `SELECT * FROM comments WHERE article_id =$1 ORDER BY created_at DESC`
+
+    return db.query(sqlQuery,[id])
+    .then((comments)=>{
+
+        if (comments.rows.length===0) {
+            return Promise.reject({status: 404, msg:"No comment found"})
+        } else{
+
+            return comments.rows
+
+        }
+    })
+}
+

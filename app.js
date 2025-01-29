@@ -4,7 +4,9 @@ const app = express()
 const {endPointInfos,
     allTopicsResponse, 
     articleInDbById,
-    allArticles} = require("./controller/controllers")
+    allArticles,
+    getCommentWithId,
+    } = require("./controller/controllers")
 
 app.use(express.json())
 
@@ -16,6 +18,10 @@ app.get("/api/articles/:article_id",articleInDbById)
 
 app.get("/api/articles",allArticles)
 
+app.get ("/api/articles/:article_id/comments",getCommentWithId)
+
+
+
 app.use((error,req,res,next) =>{
 
     if (error.code ===  '22P02') {
@@ -26,7 +32,7 @@ app.use((error,req,res,next) =>{
         res.status(error.status).json({msg:error.msg})
     }
 
-    next()
+    next(error)
 
 })
 
