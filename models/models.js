@@ -104,3 +104,24 @@ exports.commentPostById = (article_id, author, body) => {
                 });
         }); 
 };
+
+exports.updateVote = (votes,Id)=>{
+    return db.query(`SELECT * FROM articles WHERE article_id=$1`,[Id])
+    .then((({rows})=>{
+
+        if (rows.length ===0){
+            return Promise.reject({status:404, msg: "No votes found to be updated"})
+        }
+
+        const sqlQuery = `UPDATE articles
+                         SET votes = votes + $1
+                         WHERE article_id =$2 RETURNING*`
+
+        return db.query(sqlQuery,[votes,Id])
+        .then(({rows})=>{
+
+            console.log(rows)
+            return rows[0]
+        })
+    }))
+}

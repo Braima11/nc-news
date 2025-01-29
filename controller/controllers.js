@@ -3,7 +3,8 @@ const {getEndPointInfo,
     getArticlesById,
     getArticles,
     getCommentsById,
-    commentPostById}= require("../models/models")
+    commentPostById,
+    updateVote}= require("../models/models")
 
 exports.endPointInfos =(req,res,next) =>{
    const endpoints =  getEndPointInfo()
@@ -77,6 +78,23 @@ exports.articleInDbById = (req,res,next)=>{
         next(error)
     })}
 
+
+exports.votesUpdate= (req,res,next) =>{
+    const id = req.params.article_id
+    const vote = req.body.votes
+
+    updateVote(vote,id)
+    .then((votes)=>{
+        
+        res.status(200).json({votes})
+
+     
+    
+    })
+    .catch((error)=>{
+        next(error)
+    })
+}
   
 
 

@@ -209,5 +209,52 @@ describe("/api/articles/:article_id/comments", ()=>{
     })   
   })
 
+})
 
+describe("PATCH /api/articles/:article_id", ()=>{
+
+  test("update an article when provided an article_id", ()=>{
+    return request(app)
+    .patch("/api/articles/1")
+    .send({votes:7})
+    .expect(200)
+    .then(({body})=>{
+
+      console.log(body.votes)
+      expect(body.votes.votes).toBe(107)
+    })
+  })
+  test("update an article when provided a negative vote", ()=>{
+    return request(app)
+    .patch("/api/articles/1")
+    .send({votes:-7})
+    .expect(200)
+    .then(({body})=>{
+
+      console.log(body.votes)
+      expect(body.votes.votes).toBe(93)
+    })
+  })
+
+  test("test a valid id but outside the range in db", ()=>{
+    return request(app)
+    .patch("/api/articles/60")
+    .send({votes:-7})
+    .expect(404)
+    .then(({body})=>{
+      expect(body.msg).toBe("No votes found to be updated")
+    })
+  })
+
+  test("test a non- valid id ", ()=>{
+    return request(app)
+    .patch("/api/articles/ipad")
+    .send({votes:-7})
+    .expect(404)
+    .then(({body})=>{
+
+      console.log(body.msg)
+      expect(body.msg).toBe("Invalid Id Input, Id must be an Integer")
+    })
+  })
 })
