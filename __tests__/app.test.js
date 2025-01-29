@@ -253,8 +253,40 @@ describe("PATCH /api/articles/:article_id", ()=>{
     .expect(404)
     .then(({body})=>{
 
-      console.log(body.msg)
       expect(body.msg).toBe("Invalid Id Input, Id must be an Integer")
     })
   })
+})
+
+describe("DELETE /api/comments/:comment_id",()=>{
+  test("delete a comment when passed the comment_id",()=>{
+    return request(app)
+    .delete("/api/comments/2")
+    .expect(204)
+    .then(()=>{
+      return db.query(
+        'SELECT * FROM comments WHERE comment_id = 2'
+    )
+   })
+   .then(({rows})=>{
+    expect(rows.length).toBe(0)
+   })
+
+  })
+  test("test when the id is not an integer", () => {
+    return request(app)
+        .delete("/api/comments/awesome")
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe("Invalid Id Input, Id must be an Integer");
+        });
+});
+test("valid id but no comment_id that matches it", () => {
+  return request(app)
+      .delete("/api/comments/99")
+      .expect(404)
+      .then(({body}) => {
+          expect(body.msg).toBe( " comment_id not available cannot delete comment");
+      });
+});
 })

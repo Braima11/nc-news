@@ -4,7 +4,8 @@ const {getEndPointInfo,
     getArticles,
     getCommentsById,
     commentPostById,
-    updateVote}= require("../models/models")
+    updateVote,
+    deleteCommentsById}= require("../models/models")
 
 exports.endPointInfos =(req,res,next) =>{
    const endpoints =  getEndPointInfo()
@@ -87,8 +88,6 @@ exports.votesUpdate= (req,res,next) =>{
     .then((votes)=>{
         
         res.status(200).json({votes})
-
-     
     
     })
     .catch((error)=>{
@@ -97,4 +96,15 @@ exports.votesUpdate= (req,res,next) =>{
 }
   
 
+exports.commentToDelete = (req,res,next)=>{
+    const id = req.params.comment_id
 
+    deleteCommentsById(id)
+    .then(()=>{
+        res.status(204).send()
+
+    })
+    .catch((error)=>{
+        next(error)
+    })
+}
