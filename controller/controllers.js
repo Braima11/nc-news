@@ -3,7 +3,7 @@ const {getEndPointInfo,
     getArticlesById,
     getArticles,
     getCommentsById,
-    }= require("../models/models")
+    commentPostById}= require("../models/models")
 
 exports.endPointInfos =(req,res,next) =>{
    const endpoints =  getEndPointInfo()
@@ -63,7 +63,19 @@ exports.articleInDbById = (req,res,next)=>{
     })
   }
 
-
+  exports.commentsById = (req,res,next)=>{
+  
+    const id = req.params.article_id
+    const author = req.body.username
+    const body = req.body.body
+  
+    commentPostById(id,author,body)
+    .then((comment)=>{
+        res.status(201).json({comment})
+    })
+    .catch((error)=>{
+        next(error)
+    })}
 
   
 

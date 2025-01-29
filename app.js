@@ -6,7 +6,7 @@ const {endPointInfos,
     articleInDbById,
     allArticles,
     getCommentWithId,
-    } = require("./controller/controllers")
+    commentsById} = require("./controller/controllers")
 
 app.use(express.json())
 
@@ -20,7 +20,7 @@ app.get("/api/articles",allArticles)
 
 app.get ("/api/articles/:article_id/comments",getCommentWithId)
 
-
+app.post("/api/articles/:article_id/comments",commentsById)
 
 app.use((error,req,res,next) =>{
 

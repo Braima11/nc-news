@@ -83,3 +83,24 @@ exports.getCommentsById = (id)=>{
     })
 }
 
+exports.commentPostById = (article_id, author, body) => {
+    return db.query("SELECT * FROM articles WHERE article_id=$1", [article_id])
+        .then((response) => {
+            if (response.rows.length === 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "Cannot post comment, the article cannot be found with the Id provided"
+                });
+            }
+
+            const sqlQuery = `INSERT INTO comments 
+                (article_id, author, body)
+                VALUES ($1, $2, $3)
+                RETURNING *`;
+
+            return db.query(sqlQuery, [article_id, author, body])
+                .then((response) => {
+                    return response.rows[0];
+                });
+        }); 
+};

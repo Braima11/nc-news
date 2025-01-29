@@ -149,7 +149,7 @@ test("testing for valid ids but with no comments", ()=>{
   })
 })
 
-test("testing for valid ids but with no comments", ()=>{
+test("testing for invalid ids", ()=>{
 
   return request(app)
   .get("/api/articles/update/comments")
@@ -161,3 +161,53 @@ test("testing for valid ids but with no comments", ()=>{
 })
 });
 
+describe("/api/articles/:article_id/comments", ()=>{
+
+  test("post a comment using a specific article id", ()=>{
+    return request (app)
+    .post("/api/articles/1/comments")
+    .send({
+      username: "butter_bridge",
+      body:"Northcoders Bootcamp"
+    })
+    .expect(201)
+    .then((commentPosted)=>{
+      expect(commentPosted.body.comment.author).toBe("butter_bridge")
+      expect(commentPosted.body.comment.body).toBe("Northcoders Bootcamp")
+
+    })   
+  })
+
+  test("when an article with the provided id cannot be found", ()=>{
+    return request (app)
+    .post("/api/articles/50/comments")
+    .send({
+      username: "butter_bridge",
+      body:"Northcoders Bootcamp"
+    })
+    .expect(404)
+    .then((commentPosted)=>{
+
+      expect(commentPosted.body.msg).toBe("Cannot post comment, the article cannot be found with the Id provided")
+
+
+    })   
+  })
+
+  test("test for invalid id", ()=>{
+    return request (app)
+    .post("/api/articles/super/comments")
+    .send({
+      username: "butter_bridge",
+      body:"Northcoders Bootcamp"
+    })
+    .expect(404)
+    .then((commentPosted)=>{
+
+      expect(commentPosted.body.msg).toBe("Invalid Id Input, Id must be an Integer")
+
+    })   
+  })
+
+
+})
