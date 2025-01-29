@@ -5,7 +5,8 @@ const {getEndPointInfo,
     getCommentsById,
     commentPostById,
     updateVote,
-    deleteCommentsById}= require("../models/models")
+    deleteCommentsById,
+    getUsersInDb}= require("../models/models")
 
 exports.endPointInfos =(req,res,next) =>{
    const endpoints =  getEndPointInfo()
@@ -103,6 +104,17 @@ exports.commentToDelete = (req,res,next)=>{
     .then(()=>{
         res.status(204).send()
 
+    })
+    .catch((error)=>{
+        next(error)
+    })
+}
+
+exports.allUsersInDb = (req,res,next)=>{
+    getUsersInDb()
+    .then((users)=>{
+        console.log(users)
+        res.status(200).json({users})
     })
     .catch((error)=>{
         next(error)
