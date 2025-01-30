@@ -31,39 +31,41 @@ exports.getArticlesById = (id) => {
         })
 }
 
-exports.getArticles = () => {
+exports.getArticles = (queries ) => {
+    const articleColumns = [
+        "author",
+        "title", 
+        "article_id",
+        "topic",
+        "votes",
+        "article_img_url",
+        "comment_count",
+        "created_at"  
+    ];
+    
+    const sort_by = queries.sort_by || "created_at";
+    const order = queries.order || "desc";  
+    const orderArray = ["asc", "desc"];
+
+    if (!articleColumns.includes(sort_by)) {
+        return Promise.reject({ status: 400, msg: "Invalid sort_by query" });
+    }
+
+    if (!orderArray.includes(order)) { 
+        return Promise.reject({ status: 400, msg: "Order must be asc or desc" });
+    }
+
     const sqlQuery = `
-        SELECT articles.*, comments.comment_id
+        SELECT articles.*,
+               COUNT(comments.comment_id) AS comment_count
         FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id`;
-
+        LEFT JOIN comments ON articles.article_id = comments.article_id
+        GROUP BY articles.article_id
+        ORDER BY ${sort_by} ${order}`;
+    
     return db.query(sqlQuery)
-        .then((result) => {
-
-            const articleGroups = result.rows.reduce((acc, curr) => {
-                acc[curr.article_id] = acc[curr.article_id] || [];
-                acc[curr.article_id].push(curr);
-                return acc;
-            }, {});
-
-            const articles = Object.values(articleGroups).map(groupedArt => {
-                const article = groupedArt[0];
-
-                return {
-                    article_id: article.article_id,
-                    title: article.title,
-                    topic: article.topic,
-                    author: article.author,
-                    created_at: article.created_at,
-                    votes: article.votes,
-                    article_img_url: article.article_img_url,
-                    comment_count: groupedArt.length
-                };
-            });
-
-            return articles.sort((a, b) =>
-                new Date(b.created_at) - new Date(a.created_at)
-            );
+        .then(({rows}) => {
+            return rows;
         });
 };
 
@@ -120,7 +122,6 @@ exports.updateVote = (votes, Id) => {
                     return db.query(sqlQuery, [votes, Id])
         }))
         .then(({rows}) => {
-                    console.log(rows)
                     return rows[0]
                 })    
 
@@ -144,7 +145,6 @@ exports.getUsersInDb = ()=>{
     const sqlQuery = `SELECT * FROM users`
     return db.query(sqlQuery)
     .then((response)=>{
-        console.log(response.rows)
         return response.rows
     })
 }

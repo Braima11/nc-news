@@ -95,19 +95,21 @@ describe("GET /api/articles", ()=>{
     .get("/api/articles")
     .expect(200)
     .then ((articles)=>{
-      const keysInArticle= articles.body.article[12]
+      const keysInArticle= articles.body.articles[12]
 
-      expect(articles.body.article.length).toBe(13)
+      expect(articles.body.articles.length).toBe(13)
       expect(keysInArticle).toHaveProperty("article_id")
       expect(keysInArticle).toHaveProperty("topic")
       expect(keysInArticle).toHaveProperty("author")
       expect(keysInArticle).toHaveProperty("created_at")
       expect(keysInArticle).toHaveProperty("votes")
       expect(keysInArticle).toHaveProperty("article_img_url")
-      expect(articles.body.article).toBeSortedBy('created_at',{descending: true})
+      expect(articles.body.articles).toBeSortedBy('created_at',{descending: true})
       
     })
+    
   })
+  
   test("404: responds with error for incorrect path", () => {
     return request(app)
       .get("/api/articlezzzz")
@@ -116,6 +118,44 @@ describe("GET /api/articles", ()=>{
         expect(body.msg).toBe("Path not found");
       });
   });
+
+  test("should be able to sort and order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=asc")  
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles).toBeSortedBy('votes', {ascending: true});
+      });
+});
+
+test("400: responds with error for invalid sort_by query", () => {
+  return request(app)
+    .get("/api/articles?sort_by=bananas")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid sort_by query");
+    });
+});
+
+test("400: responds with error for invalid order query", () => {
+  return request(app)
+    .get("/api/articles?order=sideways")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Order must be asc or desc");
+    });
+});
+
+test("400: responds with error for invalid sort_by and order combination", () => {
+  return request(app)
+    .get("/api/articles?sort_by=bananas&order=sideways")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid sort_by query");
+    });
+});
+
+
 })
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -137,6 +177,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         })
         
   });
+  
 
 });
 

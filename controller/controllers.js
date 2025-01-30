@@ -39,24 +39,23 @@ exports.articleInDbById = (req,res,next)=>{
     })
   }
 
-  exports.allArticles = (req,res,next)=>{
-    getArticles()
-    .then((article)=>{
-        res.status(200).json({article})
+  exports.allArticles = (req, res, next) => {
+    const { sort_by, order } = req.query;
+    
+    getArticles({ sort_by, order })
+        .then((articles) => {
+            res.status(200).json({ articles });
+        })
+        .catch((error)=>{
+            next(error)
+        });
+};
 
-    })
-    .catch((error)=>{
-        next(error)
-    })
-  }
 
   exports.getCommentWithId = (req,res,next)=>{
 
     const commentId = req.params.article_id
 
-    console.log(commentId, " id in controller "
-        
-    )
     getCommentsById(commentId)
     .then((comment)=>{
         res.status(200).json({comment})
@@ -113,7 +112,6 @@ exports.commentToDelete = (req,res,next)=>{
 exports.allUsersInDb = (req,res,next)=>{
     getUsersInDb()
     .then((users)=>{
-        console.log(users)
         res.status(200).json({users})
     })
     .catch((error)=>{
