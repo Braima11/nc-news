@@ -31,7 +31,7 @@ exports.getArticlesById = (id) => {
         })
 }
 
-exports.getArticles = (queries ) => {
+exports.getArticles = (queries) => {
     const articleColumns = [
         "author",
         "title", 
@@ -46,6 +46,8 @@ exports.getArticles = (queries ) => {
     const sort_by = queries.sort_by || "created_at";
     const order = queries.order || "desc";  
     const orderArray = ["asc", "desc"];
+    const topics = queries.topic;
+    const args = [];
 
     if (!articleColumns.includes(sort_by)) {
         return Promise.reject({ status: 400, msg: "Invalid sort_by query" });
@@ -55,16 +57,28 @@ exports.getArticles = (queries ) => {
         return Promise.reject({ status: 400, msg: "Order must be asc or desc" });
     }
 
-    const sqlQuery = `
+    let sqlQuery = `
         SELECT articles.*,
                COUNT(comments.comment_id) AS comment_count
         FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id
-        GROUP BY articles.article_id
-        ORDER BY ${sort_by} ${order}`;
+        LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
+    if (topics) {
+        sqlQuery += ` WHERE articles.topic = $1`;
+        args.push(topics);
+    }
+
+    sqlQuery += ` GROUP BY articles.article_id
+                  ORDER BY ${sort_by} ${order}`;
     
-    return db.query(sqlQuery)
+    return db.query(sqlQuery, args)
         .then(({rows}) => {
+            if ( rows.length === 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "Topic not found"
+                });
+            }
             return rows;
         });
 };

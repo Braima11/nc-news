@@ -40,9 +40,9 @@ exports.articleInDbById = (req,res,next)=>{
   }
 
   exports.allArticles = (req, res, next) => {
-    const { sort_by, order } = req.query;
+    const { sort_by, order,topic } = req.query;
     
-    getArticles({ sort_by, order })
+    getArticles({ sort_by, order,topic })
         .then((articles) => {
             res.status(200).json({ articles });
         })
