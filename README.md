@@ -4,7 +4,7 @@
 
 The **NC News API** is a backend service designed to provide programmatic access to application data, mimicking the functionality of a real-world platform like Reddit. This API allows users to interact with a PostgreSQL database using Node.js and the `node-postgres` library. It supports various endpoints to retrieve, add, update, and delete data related to topics, articles, comments, and users.
 
-This project is built with a focus on RESTful principles, ensuring a clean and intuitive interface for front-end applications to consume. It also includes Git hooks using Husky to enforce code quality by preventing commits that fail tests.
+This project is built with a focus on RESTful principles, ensuring a clean and intuitive interface for front-end applications to consume.
 
 Live API: https://news-journal.onrender.com/
 
@@ -36,7 +36,7 @@ Live API: https://news-journal.onrender.com/
 | `/api/comments/:comment_id`          | DELETE     | Delete a comment by its ID.                                       |
 | `/api/users`                         | GET        | Retrieve a list of all users.                                     |
 
----
+## Access the API documentation at /api for a full list of available endpoints and their usage.
 
 ## Installation Instructions
 
