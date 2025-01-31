@@ -31,7 +31,7 @@ exports.getArticlesById = (id) => {
             if (article.rows.length === 0) {
                 return Promise.reject({ status: 404, msg: "Article not found with this Id" })
             } else {
-                return article.rows
+                return article.rows[0]
             }
 
         })
@@ -90,20 +90,26 @@ exports.getArticles = (queries) => {
 };
 
 exports.getCommentsById = (id) => {
-    const sqlQuery = `SELECT * FROM comments WHERE article_id =$1 ORDER BY created_at DESC`
-
-    return db.query(sqlQuery, [id])
-        .then((comments) => {
-
-            if (comments.rows.length === 0) {
-                return Promise.reject({ status: 404, msg: "No comment found" })
-            } else {
-
-                return comments.rows
-
+    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [id])
+        .then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "No articles found"
+                });
             }
+            const sqlQuery = `
+                SELECT * FROM comments 
+                WHERE article_id = $1 
+                ORDER BY created_at DESC`;
+            
+            return db.query(sqlQuery, [id]);
         })
-}
+        .then(({ rows }) => {
+          
+            return rows;
+        });
+};
 
 exports.commentPostById = (article_id, author, body) => {
     return db.query("SELECT * FROM articles WHERE article_id=$1", [article_id])

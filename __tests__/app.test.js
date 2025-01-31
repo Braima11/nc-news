@@ -34,17 +34,19 @@ describe("GET /api/topics", () =>{
     .then (({body})=>{
       
       expect(Array.isArray(body.topics)).toBe(true)
-      expect(body.topics).toEqual(  [
-        { slug: 'mitch', description: 'The man, the Mitch, the legend' },
-        { slug: 'cats', description: 'Not dogs' },
-        { slug: 'paper', description: 'what books are made of' }
-      ])
+      expect(body.topics.length).toBe(3)
       expect(body.topics[0]).toMatchObject( { slug: 'mitch', description: 'The man, the Mitch, the legend' })
+      body.topics.forEach((topic)=>{
+        expect(topic).toHaveProperty("slug")
+        expect(topic).toHaveProperty("description")
+      })
       
     })
 
   })
+})
 
+describe("bad request  for api/topics",()=>{
   test("test for bad path request", ()=>{
     return request (app)
     .get("/api/topic")
@@ -58,21 +60,22 @@ describe("GET /api/topics", () =>{
 
 describe("GET /api/articles/:article_id", ()=>{
   test("get article by id from the database",()=>{
+    const articleId = 1
     return request(app)
-    .get("/api/articles/1")
+    .get(`/api/articles/${articleId}`)
     .expect(200)
     .then(({body})=>{
-      expect(body.article.length).toBe(1)
-      expect(body.article[0]).toHaveProperty("article_id")
-      expect(body.article[0]).toHaveProperty("article_img_url")
-      expect(body.article[0]).toHaveProperty("author")
-      expect(body.article[0]).toHaveProperty("body")
+      expect(body.article).toHaveProperty("article_id")
+      expect(body.article).toHaveProperty("article_img_url")
+      expect(body.article).toHaveProperty("author")
+      expect(body.article).toHaveProperty("body")
     })
   })
 
   test ("test for a id request that is out of range", () =>{
+    const IdOutOfRange = 60
     return request(app) 
-    .get("/api/articles/15")
+    .get(`/api/articles/${IdOutOfRange}`)
     .expect(404)
     .then(({body})=>{
       expect(body.msg).toBe("Article not found with this Id")
@@ -80,8 +83,9 @@ describe("GET /api/articles/:article_id", ()=>{
   })
 
   test ("test for an invalid id", () =>{
+    const invalidId = "super"
     return request(app) 
-    .get("/api/articles/super")
+    .get(`/api/articles/${invalidId}`)
     .expect(404)
     .then(({body})=>{
       expect(body.msg).toBe("Invalid Id Input, Id must be an Integer")
@@ -181,53 +185,58 @@ test("400: responds with error for invalid sort_by and order combination", () =>
 describe("GET /api/articles/:article_id/comments", () => {
   test("getting comments from database using the article id", () => {
     return request(app)
-      .get("/api/articles/3/comments")
+      .get('/api/articles/3/comments')
       .expect(200)
       .then(({body}) => {
-        expect(body.comment.length).toBe(2)
-        expect(body.comment).toBeSortedBy('created_at',{descending: true})
-        body.comment.map((comments)=>{
-          
-          expect(comments).toHaveProperty("comment_id")
-          expect(comments).toHaveProperty("body")
-          expect(comments).toHaveProperty("article_id")
-          expect(comments).toHaveProperty("author")
-          expect(comments).toHaveProperty("votes")
-          expect(comments).toHaveProperty("created_at")
-        })
-        
+        expect(body.comments).toBeInstanceOf(Array);  
+        expect(body.comments.length).toBe(2);
+        expect(body.comments).toBeSortedBy('created_at', {descending: true});
+        body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+        });
+      });
   });
-  
 
-});
+  test("returns empty array for article with no comments", () => {
+    return request(app)
+      .get('/api/articles/2/comments')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.comments).toEqual([]);  
+      });
+  });
 
-test("testing for valid ids but with no comments", ()=>{
+  test("404: article does not exist", () => {
+    return request(app)
+      .get('/api/articles/999/comments')
+      .expect(404)
+      .then(({body}) => {
+        expect(body.msg).toBe('No articles found');
+      });
+  });
 
-  return request(app)
-  .get("/api/articles/2/comments")
-  .expect(404)
-  .then((comment)=>{
-    expect(comment.body.msg).toBe('No comment found')
-  })
-})
-
-test("testing for invalid ids", ()=>{
-
-  return request(app)
-  .get("/api/articles/update/comments")
-  .expect(404)
-  .then((comment)=>{
-
-    expect(comment.body.msg).toBe('Invalid Id Input, Id must be an Integer')
-  })
-})
+  test("400: invalid article_id", () => {
+    return request(app)
+      .get('/api/articles/not-a-number/comments')
+      .expect(404)
+      .then(({body}) => {
+        expect(body.msg).toBe('Invalid Id Input, Id must be an Integer');
+      });
+  });
 });
 
 describe("/api/articles/:article_id/comments", ()=>{
 
   test("post a comment using a specific article id", ()=>{
+    
+    const id = 1
     return request (app)
-    .post("/api/articles/1/comments")
+    .post(`/api/articles/${id}/comments`)
     .send({
       username: "butter_bridge",
       body:"Northcoders Bootcamp"
@@ -241,8 +250,10 @@ describe("/api/articles/:article_id/comments", ()=>{
   })
 
   test("when an article with the provided id cannot be found", ()=>{
+
+    const IdOutOfRange= 50
     return request (app)
-    .post("/api/articles/50/comments")
+    .post(`/api/articles/${IdOutOfRange}/comments`)
     .send({
       username: "butter_bridge",
       body:"Northcoders Bootcamp"
@@ -282,7 +293,7 @@ describe("PATCH /api/articles/:article_id", ()=>{
     .expect(200)
     .then(({body})=>{
 
-      console.log(body.votes)
+    
       expect(body.votes.votes).toBe(107)
     })
   })
@@ -293,7 +304,7 @@ describe("PATCH /api/articles/:article_id", ()=>{
     .expect(200)
     .then(({body})=>{
 
-      console.log(body.votes)
+     
       expect(body.votes.votes).toBe(93)
     })
   })

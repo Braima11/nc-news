@@ -57,8 +57,8 @@ exports.articleInDbById = (req,res,next)=>{
     const commentId = req.params.article_id
 
     getCommentsById(commentId)
-    .then((comment)=>{
-        res.status(200).json({comment})
+    .then((comments)=>{
+        res.status(200).json({comments})
     })
     .catch((error)=>{
         next(error)
