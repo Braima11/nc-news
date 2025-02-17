@@ -1,4 +1,6 @@
 const express = require("express")
+
+const cors = require('cors')
 const app = express()
 
 const {endPointInfos,
@@ -11,6 +13,7 @@ const {endPointInfos,
     commentToDelete,
     allUsersInDb} = require("./controller/controllers")
 
+app.use(cors());
 app.use(express.json())
 
 app.get("/api",endPointInfos)
@@ -30,6 +33,7 @@ app.patch("/api/articles/:article_id",votesUpdate)
 app.delete("/api/comments/:comment_id",commentToDelete)
 
 app.get("/api/users", allUsersInDb)
+ 
 
 
 
